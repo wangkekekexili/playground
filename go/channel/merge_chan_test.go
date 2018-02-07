@@ -5,30 +5,36 @@ import (
 	"testing"
 )
 
+var funcs = []struct {
+	name string
+	f    func(...<-chan int) <-chan int
+}{
+	{"goroutines", merge},
+	{"reflection", mergeReflect},
+	{"recursive", mergeRecursive},
+}
+
 func TestMerge(t *testing.T) {
-	c := merge(asChan(1, 2, 3), asChan(4, 5, 6), asChan(7, 8, 9))
-	seen := make(map[int]bool)
-	for v := range c {
-		if seen[v] {
-			t.Fatalf("%v is seen at least twice", v)
-		}
-		seen[v] = true
-	}
-	for i := 1; i != 9; i++ {
-		if !seen[i] {
-			t.Errorf("%v is missing", i)
-		}
+	for _, f := range funcs {
+		t.Run(f.name, func(t *testing.T) {
+			c := f.f(asChan(1, 2, 3), asChan(4, 5, 6), asChan(7, 8, 9))
+			seen := make(map[int]bool)
+			for v := range c {
+				if seen[v] {
+					t.Fatalf("%v is seen at least twice", v)
+				}
+				seen[v] = true
+			}
+			for i := 1; i != 9; i++ {
+				if !seen[i] {
+					t.Errorf("%v is missing", i)
+				}
+			}
+		})
 	}
 }
 
 func BenchmarkMerge(b *testing.B) {
-	funcs := []struct {
-		name string
-		f    func(...<-chan int) <-chan int
-	}{
-		{"goroutines", merge},
-		{"reflection", mergeReflect},
-	}
 	for _, f := range funcs {
 		for n := 1; n <= 1024; n *= 2 {
 			chans := make([]<-chan int, n)
