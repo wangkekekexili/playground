@@ -28,7 +28,7 @@ func (t *tokens) Set(s string) error {
 
 func main() {
 	var t tokens
-	flag.Var(&t, "tokens", "a list of comman separeted tokens")
+	flag.Var(&t, "tokens", "a list of comma separated tokens")
 	flag.Parse()
 	fmt.Println(t)
 }
