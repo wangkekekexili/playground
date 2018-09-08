@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Books</title>
+</head>
+<body>
+<p>{{ .Name }}</p>
+
+{{ if .DBStatus }}
+<p>The database connection is good.</p>
+{{ else}}
+<p>Don't have database connection.</p>
+{{ end }}
+</body>
+</html>
