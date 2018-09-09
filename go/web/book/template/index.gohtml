@@ -2,15 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.js"
+            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+            crossorigin="anonymous"></script>
+    <script>
+        function submitSearch() {
+            $.ajax({
+                url: "/search",
+                method: "POST",
+                data: $("#search-form").serialize(),
+                success: function (data) {
+                    let parsed = JSON.parse(data);
+                    if (!parsed) return;
+
+                    let searchResult = $("#search-results");
+                    searchResult.empty();
+
+                    parsed.forEach(function (e) {
+                        let row = $("<tr><td>" + e.name + "</td><td>" + e.author + "</td><td>" + e.year + "</td><td>" + e.id + "</td><tr></tr>");
+                        searchResult.append(row);
+                    });
+                }
+            });
+            return false;
+        }
+    </script>
     <title>My Books</title>
 </head>
 <body>
-<p>{{ .Name }}</p>
+<form id="search-form" onsubmit="return false">
+    <input type="search"/>
+    <input type="submit" onclick="submitSearch()"/>
+</form>
 
-{{ if .DBStatus }}
-<p>The database connection is good.</p>
-{{ else}}
-<p>Don't have database connection.</p>
-{{ end }}
+<table width="100%">
+    <thead>
+    <tr style="text-align: left">
+        <th width="40%">Title</th>
+        <th width="30%">Author</th>
+        <th width="20%">Year</th>
+        <th width="10%">ID</th>
+    </tr>
+    </thead>
+    <tbody id="search-results">
+    </tbody>
+</table>
 </body>
 </html>

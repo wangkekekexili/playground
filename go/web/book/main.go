@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -12,6 +13,13 @@ import (
 type Page struct {
 	Name     string
 	DBStatus bool
+}
+
+type SearchResult struct {
+	Name   string `json:"name"`
+	Author string `json:"author"`
+	Year   string `json:"year"`
+	ID     string `json:"id"`
 }
 
 func main() {
@@ -36,5 +44,14 @@ func main() {
 
 		tmpl.ExecuteTemplate(w, "index.gohtml", p)
 	})
+
+	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
+		results := []SearchResult{
+			{"Unlimited Memory", "Kevin", "2014", "B00I3QS1XQ"},
+			{"The Extraordinary Life of Sam Hell: A Novel", "Robert", "2018", "B07BNVZDM7"},
+		}
+		json.NewEncoder(w).Encode(results)
+	})
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
